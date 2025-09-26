@@ -6,9 +6,10 @@
 
 ---
 
-## 📂 디렉토리 구조 (예시)
+## 📂 디렉토리 구조 
 
-transformer_qabot/
+transformer_qabot
+
 ├── data.txt # Q/A 학습 데이터
 ├── my_tokenizer.py # 단어 단위 토크나이저(표준 tokenize 충돌 방지)
 ├── train_qabot_words.py # 단어 단위 Q/A 학습 스크립트(Transformer)
