@@ -14,7 +14,7 @@ transformer_qabot/
 ├── train_qabot_words.py # 단어 단위 Q/A 학습 스크립트 (Transformer)
 ├── chat_words.py        # 학습된 모델 로드 후 질의응답 실행
 ├── requirements.txt     # 의존성 (torch, numpy)
-├── README.md            # 이 문서
+├── README.md            
 ├── .gitignore           # venv, .env, *.pt 등 제외
 ├── qabot_words.pt       # (학습 후 생성) 모델 가중치
 ├── train_qabot.py       # (옵션) 문자 단위 학습 스크립트
