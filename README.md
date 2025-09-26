@@ -5,13 +5,32 @@
 
 ---
 
-## 🚀 실행 방법
 
-### 1. 환경 세팅
-```bash
+## 📂 디렉토리 구조
+
+```text
+transformer_qabot/
+├── data.txt                  # Q/A 학습 데이터
+├── my_tokenizer.py           # 단어 단위 토크나이저(표준 tokenize 모듈과 충돌 방지)
+├── train_qabot_words.py      # 단어 단위 Q/A 학습 스크립트(Transformer)
+├── chat_words.py             # 학습된 모델 로드 후 질의응답 실행
+├── requirements.txt          # 의존성 (torch, numpy)
+├── README.md                 # 이 문서
+├── .gitignore                # venv, .env, *.pt 등 제외
+├── qabot_words.pt            # (학습 후 생성) 모델 가중치
+├── train_qabot.py            # (옵션) 문자 단위 학습 스크립트
+├── chat.py                   # (옵션) 문자 단위 생성 실행
+└── venv/, __pycache__/       # 자동 생성(업로드 제외)
+
+🚀 실행 방법 (macOS / zsh)
+
+1) 가상환경 & 의존성
+
+cd ~/transformer_qabot
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
 
 # Transformer Q/A Chatbot (학습용)
 
@@ -113,3 +132,36 @@ max_new_tokens가 짧아 중간에 잘릴 수 있음.
 max_new_tokens를 80~100으로 늘림.
 data.txt에서 Q:/A: 접두어를 제거해 “답변만” 나오도록 유도.
 Q/A 쌍을 더 추가해서 패턴 일반화.
+===========================================================
+
+2) 데이터 확인/수정
+
+data.txt에 Q/A 샘플이 포함되어 있습니다(자유롭게 추가/수정).
+
+===========================================================
+
+3) 학습
+
+python train_qabot_words.py
+
+예시 로그:
+step 0 loss 3.90
+...
+step 450 loss 0.05
+
+완료 후 qabot_words.pt 생성.
+
+===========================================================
+
+4) 실행(대화)
+
+python chat_words.py
+
+예시 입력:
+너: 트랜스포머가 뭐야?
+너: GPT는 뭐야?
+종료: exit / quit 또는 Ctrl+C / Ctrl+D
+
+## 실행 화면
+![실행 화면](docs/images/transformer_demo.png)
+      
