@@ -59,6 +59,4 @@ python chat_words.py
 
 ## 📸 실행 화면
 
-<p align="center">
-  <img src="docs/transformer_demo.png" alt="실행 화면" width="600"/>
-</p>
+![실행 화면](docs/transformer_demo.png)
