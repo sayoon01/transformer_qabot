@@ -1,33 +1,34 @@
-import math, torch, re
+import math, torch
 import torch.nn as nn
 import torch.nn.functional as F
-from my_tokenizer import tokenize
+import joblib
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # -----------------------
 # 1) 데이터 로드 & 토큰화
 # -----------------------
-with open("data.txt","r",encoding="utf-8") as f:
-    text = f.read()
+with open("data.txt", "r", encoding="utf-8") as f:
+    text = f.read().lower()
 
-tokens = tokenize(text)
+# 단순 토큰화 (공백 단위)
+tokens = text.split()
 vocab = sorted(set(tokens))
-stoi = {w:i for i,w in enumerate(vocab)}
-itos = {i:w for i,w in enumerate(vocab)}
+stoi = {w: i for i, w in enumerate(vocab)}
+itos = {i: w for i, w in enumerate(vocab)}
 
-encode = lambda s: [stoi[w] for w in tokenize(s)]
+encode = lambda s: [stoi[w] for w in s.split() if w in stoi]
 decode = lambda ids: " ".join([itos[i] for i in ids])
 
 data = torch.tensor([stoi[w] for w in tokens], dtype=torch.long)
-n = int(len(data)*0.9)
+n = int(len(data) * 0.9)
 train_data, val_data = data[:n], data[n:]
 
 # -----------------------
 # 2) 하이퍼파라미터
 # -----------------------
 batch_size = 16
-block_size = 16   # 단어 단위 길이
+block_size = 32   # 한 Q/A 문장 길이 고려
 n_embed = 128
 n_head = 4
 n_layer = 2
@@ -39,14 +40,14 @@ max_iters = 500
 # 3) 배치 함수
 # -----------------------
 def get_batch(split):
-    d = train_data if split=="train" else val_data
-    ix = torch.randint(len(d)-block_size-1, (batch_size,))
-    x = torch.stack([d[i:i+block_size] for i in ix])
-    y = torch.stack([d[i+1:i+1+block_size] for i in ix])
+    d = train_data if split == "train" else val_data
+    ix = torch.randint(len(d) - block_size - 1, (batch_size,))
+    x = torch.stack([d[i:i + block_size] for i in ix])
+    y = torch.stack([d[i + 1:i + 1 + block_size] for i in ix])
     return x.to(device), y.to(device)
 
 # -----------------------
-# 4) Transformer 구현
+# 4) Transformer 모델
 # -----------------------
 class Head(nn.Module):
     def __init__(self, n_embed, head_size):
@@ -114,7 +115,7 @@ class TransformerLM(nn.Module):
         if targets is not None:
             loss = F.cross_entropy(logits.view(B*T,-1), targets.view(B*T))
         return logits, loss
-    def generate(self, idx, max_new_tokens=30):
+    def generate(self, idx, max_new_tokens=50):
         for _ in range(max_new_tokens):
             logits,_ = self(idx[:, -block_size:])
             probs = F.softmax(logits[:,-1,:], dim=-1)
@@ -129,10 +130,14 @@ model = TransformerLM(len(vocab)).to(device)
 opt = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
 for step in range(max_iters):
-    xb,yb = get_batch("train")
-    logits, loss = model(xb,yb)
+    xb, yb = get_batch("train")
+    logits, loss = model(xb, yb)
     opt.zero_grad(); loss.backward(); opt.step()
     if step % 50 == 0:
         print(f"step {step} loss {loss.item():.4f}")
 
+# 모델 + vocab 저장
 torch.save(model.state_dict(), "qabot_words.pt")
+joblib.dump(stoi, "stoi.pkl")
+joblib.dump(itos, "itos.pkl")
+print("✅ 모델과 vocab 저장 완료: qabot_words.pt, stoi.pkl, itos.pkl")
