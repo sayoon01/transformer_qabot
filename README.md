@@ -57,5 +57,8 @@ python chat_words.py
 대화 종료!
 
 
-📸 실행 화면
-<p align="center"> <img src="docs/transformer_demo.png" width="600"> </p>
+## 📸 실행 화면
+
+<p align="center">
+  <img src="docs/transformer_demo.png" alt="실행 화면" width="600"/>
+</p>
