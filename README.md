@@ -20,7 +20,7 @@ transformer_qabot/
 ├── stoi.pkl / itos.pkl       # (학습 후 생성) vocab 사전
 ├── docs/
 │   └── transformer_demo.png  # 실제 실행 화면 캡쳐
-└── venv/, __pycache__/       # 자동 생성(업로드 제외)
+└── venv/, __pycache__/       # 자동 생성
 
 🧾 데이터 형식 (data.txt)
 학습 데이터는 Q:와 A: 접두어를 사용합니다:
